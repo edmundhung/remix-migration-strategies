@@ -16,7 +16,7 @@
   "scripts": {
     "start": "react-scripts start",
     "dev": "concurrently \"npm:dev:*\"",
-    "dev:client": "REACT_APP_SERVER_ORIGIN=http://localhost:4567 npm start",
+    "dev:client": "REACT_APP_SERVER_HOST=http://localhost:4567 npm start",
     "dev:remix": "cross-env PORT=4567 npm run dev --prefix ./server",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -30,7 +30,7 @@ app.all(
 );
 
 // Fallback to client through proxy
-app.use(proxy(process.env.CLIENT_ORIGIN, {
+app.use(proxy(process.env.CLIENT_HOST, {
   filter: req => req.method == 'GET',
 }));
 

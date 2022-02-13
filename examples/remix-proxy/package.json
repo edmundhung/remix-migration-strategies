@@ -6,7 +6,7 @@
   "scripts": {
     "build": "remix build",
     "dev": "concurrently \"npm:dev:*\"",
-    "dev:remix": "cross-env CLIENT_ORIGIN=http://localhost:4567 remix dev",
+    "dev:remix": "cross-env CLIENT_HOST=http://localhost:4567 remix dev",
     "dev:client": "cross-env PORT=4567 BROWSER=none npm start --prefix ./client",
     "postinstall": "remix setup node",
     "start": "remix-serve build"

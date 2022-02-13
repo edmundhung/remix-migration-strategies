@@ -32,7 +32,7 @@ app.all(
 if (process.env.NODE_ENV === 'development') {
   // On development, we continue using the server-proxy approach
   // As this allows reusing the dev server from create-react-app
-  app.use(proxy(process.env.CLIENT_ORIGIN, {
+  app.use(proxy(process.env.CLIENT_HOST, {
     filter: req => req.method == 'GET',
   }));
 } else {

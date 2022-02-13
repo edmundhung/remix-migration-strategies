@@ -8,7 +8,7 @@
     "dev": "concurrently \"npm:dev:*\"",
     "dev:remix": "remix watch",
     "dev:client": "cross-env PORT=4567 BROWSER=none npm start --prefix ./client",
-    "dev:express": "cross-env CLIENT_ORIGIN=http://localhost:4567 NODE_ENV=development node server/index.js",
+    "dev:express": "cross-env CLIENT_HOST=http://localhost:4567 NODE_ENV=development node server/index.js",
     "postinstall": "remix setup node",
     "start": "cross-env NODE_ENV=production node server/index.js"
   },

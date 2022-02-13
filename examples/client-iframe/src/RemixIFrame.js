@@ -6,5 +6,5 @@ export default function RemixIframe() {
         border: 'none',
     };    
 
-    return <iframe title="remix" style={style} src={process.env.REACT_APP_SERVER_ORIGIN} />;
+    return <iframe title="remix" style={style} src={process.env.REACT_APP_SERVER_HOST} />;
 }

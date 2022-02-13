@@ -16,9 +16,9 @@ async function proxyRequest(request: Request, origin: string): Promise<Response>
 }
 
 export let loader: LoaderFunction = async ({ request }) => {
-    if (!process.env.CLIENT_ORIGIN) {
-        throw new Error('process.env.CLIENT_ORIGIN is missing');
+    if (!process.env.CLIENT_HOST) {
+        throw new Error('process.env.CLIENT_HOST is missing');
     }
 
-    return proxyRequest(request, process.env.CLIENT_ORIGIN)  
+    return proxyRequest(request, process.env.CLIENT_HOST)  
 };
