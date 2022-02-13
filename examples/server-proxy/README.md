@@ -1,59 +1,49 @@
-# Welcome to Remix!
+# server-proxy
 
-- [Remix Docs](https://remix.run/docs)
+This project was bootstrapped using [Remix](https://github.com/remix-run/remix) Express Server template with the `client` directory created based on [Create React App](https://github.com/facebook/create-react-app).
 
-## Development
+## How it works
 
-You'll need to run two terminals (or bring in a process manager like concurrently/pm2-dev if you like):
+```js
+// remix.config.js
+module.exports = {
+  // Prefix public path with the basename 
+  publicPath: "/basename/build/",
+};
 
-Start the Remix development asset server
-
-```sh
-npm run dev
 ```
 
-In a new tab start your express app:
+```js
+// server/index.js
 
-```sh
-npm run start:dev
+// Update all app handler with the basename
+app.use('/basename', express.static("public", { maxAge: "1h" }));
+app.use('/basename', express.static("public/build", { immutable: true, maxAge: "1y" }));
+app.all(
+  "/basename",
+  MODE === "production"
+    ? createRequestHandler({ build: require("./build") })
+    : (req, res, next) => {
+        purgeRequireCache();
+        const build = require("./build");
+        return createRequestHandler({ build, mode: MODE })(req, res, next);
+      }
+);
+
+// Fallback to client through proxy
+app.use(proxy(process.env.CLIENT_HOST, {
+  filter: req => req.method == 'GET',
+}));
 ```
 
-This starts your app in development mode, which will purge the server require cache when Remix rebuilds assets so you don't need a process manager restarting the express server.
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying express applications you should be right at home just make sure to deploy the output of `remix build`
-
-- `server/build/`
-- `public/build/`
-
-### Using a Template
-
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
-
-```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
+```jsonc
+// package.json
+{
+    scripts: {
+        "dev": "concurrently \"npm:dev:*\"",
+        "dev:remix": "remix watch",
+        "dev:client": "cross-env PORT=4567 BROWSER=none npm start --prefix ./client",
+        "dev:express": "cross-env CLIENT_HOST=http://localhost:4567 NODE_ENV=development node server/index.js",
+    }
+}
 ```

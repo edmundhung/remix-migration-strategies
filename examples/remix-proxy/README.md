@@ -1,53 +1,44 @@
-# Welcome to Remix!
+# remix-proxy
 
-- [Remix Docs](https://remix.run/docs)
+This project was bootstrapped using [Remix App server](https://github.com/remix-run/remix) with the `client` directory created based on [Create React App](https://github.com/facebook/create-react-app).
 
-## Development
+## How it works
 
-From your terminal:
+```tsx
+// $.tsx
+import { LoaderFunction } from "remix";
 
-```sh
-npm run dev
+/**
+ * Proxy request based on the provided origin
+ */
+async function proxyRequest(request: Request, origin: string): Promise<Response> {
+    let url = new URL(request.url);
+    let destination = url.toString().replace(url.origin, origin);
+    let response = await fetch(destination, request);
+    let headers = new Headers(Array.from(response.headers.entries()).filter(([key, value]) => ['content-type'].includes(key)));
+
+    return new Response(response.body, {
+        status: response.status,
+        headers,
+    });
+}
+
+export let loader: LoaderFunction = async ({ request }) => {
+    if (!process.env.CLIENT_HOST) {
+        throw new Error('process.env.CLIENT_HOST is missing');
+    }
+
+    return proxyRequest(request, process.env.CLIENT_HOST)  
+};
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
-
-### Using a Template
-
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
-
-```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
+```jsonc
+// package.json
+{
+    scripts: {
+        "dev": "concurrently \"npm:dev:*\"",
+        "dev:remix": "cross-env CLIENT_HOST=http://localhost:4567 remix dev",
+        "dev:client": "cross-env PORT=4567 BROWSER=none npm start --prefix ./client",
+    }
+}
 ```
